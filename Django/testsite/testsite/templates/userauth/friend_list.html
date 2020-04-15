@@ -1,0 +1,13 @@
+{% extends 'start_page.html' %}
+
+{% block title %}Список ваших друзей (случайные 5){% endblock %}
+
+{% block content %}
+  {% if list_of_users %}
+    {% for user in list_of_users %}
+      <a>{{user.username}}<br></a>
+    {% endfor %}
+  {% else %}
+    Пользователи не найдены
+  {% endif %}
+{% endblock %}

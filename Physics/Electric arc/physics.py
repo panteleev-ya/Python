@@ -9,7 +9,7 @@ class Ladder:
 
 # Заранее известные константы
     arc_a = -9.81  # Ускорение дуги по оси Y (масса плазмы отрицательна)
-    air_E_min = 3 * 10 ** 6  # Электрическая прочность воздушного промежутка (В/м) 3000в/мм => 15000/х = 3000 => х = 5см, а в Галилео было около 3см разница, но дуга все равно разрывалась
+    air_E_min = 3 * 10 ** 6  # Электрическая прочность воздушного промежутка (В/м) 3000в/мм => 15000/х = 3000 => х = 5мм, а в Галилео было около 3см разница, но дуга все равно разрывалась
     g = 9.81  # Ускорение свободного падения (м/с^2)
     ion_y = 5 * 10 ** (-2)  # Коэффициент вторичной ионизации
 
@@ -33,7 +33,7 @@ class Ladder:
     wire_length = 0  # Длина проводов между источником и проводниками - [0.1; 10.0] (в метрах) (до десятых)
     wire_p = 0  # Удельное сопротивление проводов - [0.015; 1.500] (в Ом*мм^2/м)
     wire_S = 0  # Площадь поперечного сечения провода - [0.5; 1600.0] (в мм^2) (до десятых)
-    start_data = 0  # содержит все начальные параметры дуги
+    start_data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]  # содержит все начальные параметры дуги
 # Вычисленные, не изменяющиеся данные
     wire_R = 0  # (R = p*l/S) -> сопротивление каждого провода (они оба одинаковые)
     wire_Q_dt = 0  # (Q/t = I^2*R) -> выделяемое количество теплоты на каждом проводе в секунду
@@ -71,6 +71,7 @@ class Ladder:
         self.stick_p = stick_p
         self.stick_S = stick_S
         self.ion_y = y
+        return
 
     # Округление полученных данных
     def round_data(self):
@@ -82,17 +83,19 @@ class Ladder:
 
     # Обновить данные до начальных
     def reload_data(self):
-        self.arc_h = self.start_data[0]
-        self.stick_passed_length = self.start_data[1]
-        self.stick_passed_R = self.start_data[2]
-        self.arc_length = self.start_data[3]
-        self.arc_R = self.start_data[4]
-        self.battery_I = self.start_data[5]
-        self.wire_U = self.start_data[6]
-        self.stick_passed_U = self.start_data[7]
-        self.arc_U = self.start_data[8]
-        self.arc_E = self.start_data[9]
-        self.arc_position = self.start_data[10]
+        self.arc_h = 0
+        self.make_start_calculations()
+        # self.arc_h = self.start_data[0]
+        # self.stick_passed_length = self.start_data[1]
+        # self.stick_passed_R = self.start_data[2]
+        # self.arc_length = self.start_data[3]
+        # self.arc_R = self.start_data[4]
+        # self.battery_I = self.start_data[5]
+        # self.wire_U = self.start_data[6]
+        # self.stick_passed_U = self.start_data[7]
+        # self.arc_U = self.start_data[8]
+        # self.arc_E = self.start_data[9]
+        # self.arc_position = self.start_data[10]
         return
 
     # Стартовые рассчеты
@@ -114,19 +117,19 @@ class Ladder:
             self.arc_exist = False  # дуга не "зажжется"
 
         # Записать стартовые данные для дуги
-        self.start_data = [
-            self.arc_h,
-            self.stick_passed_length,
-            self.stick_passed_R,
-            self.arc_length,
-            self.arc_R,
-            self.battery_I,
-            self.wire_U,
-            self.stick_passed_U,
-            self.arc_U,
-            self.arc_E,
-            self.arc_position
-        ]
+        # self.start_data = [
+        #     self.arc_h,
+        #     self.stick_passed_length,
+        #     self.stick_passed_R,
+        #     self.arc_length,
+        #     self.arc_R,
+        #     self.battery_I,
+        #     self.wire_U,
+        #     self.stick_passed_U,
+        #     self.arc_U,
+        #     self.arc_E,
+        #     self.arc_position
+        # ]
         return
 
     # Функция обновления позиции объекта
@@ -136,6 +139,8 @@ class Ladder:
 
             # Вычисляем высоту, на которую поднялась дуга
             self.arc_h = -self.arc_a * t * t / 2  # h = at^2 / 2
+            if self.arc_h > self.arc_max_h:
+                self.arc_max_h = self.arc_h
 
             # Вычисляем длину участка проводника, который теперь добавляется к компонентам цепи
             self.stick_passed_length = self.arc_h / cos((self.stick_angle * pi / 180) / 2)  # (hд / cos(a / 2))
@@ -145,7 +150,9 @@ class Ladder:
 
             # Вычисляем длину получившейся дуги
             self.delta_X = self.arc_h * tan((self.stick_angle * pi / 180) / 2)
-            self.arc_length = self.stick_d + 2 * self.delta_X  # (L = L0 + 2 * delta X)
+            L = self.stick_d + 2 * self.delta_X  # (L = L0 + 2 * delta X)
+            self.arc_length = L / 2 * (1 + 1 / cos((self.stick_angle * pi / 180) / 2))  # (len = L / 2 * (1 + 1 / cos(a / 2) ))
+            print(self.arc_length / L)
 
             # Вычисляем сопротивление получившейся дуги
             self.arc_R = self.arc_p * self.arc_length / self.arc_S  # (Rд = p * l / S)
@@ -174,34 +181,25 @@ class Ladder:
                 self.arc_start_position[1] + self.arc_h   # позиция по оси Y получается по формуле
             ]
 
-            # Проверку на то, что дуга не оборвалась
-            if self.arc_E < self.air_E_min:
-                self.arc_max_h = self.arc_h
-                self.arc_exist = False
-
             # Проверка на достижение максимального положения
             if self.stick_passed_length >= self.stick_length:
-                self.arc_max_h = self.arc_h
                 self.arc_exist = False
         return
 
     # Передать информацию в виде списка
     def get_info(self):
         return [
-            ["Battery -> U", round(self.battery_U, self.output_precision)],
-            ["Battery -> I", round(self.battery_I, self.output_precision)],
-            ["Wires -> R", round(self.wire_R, self.output_precision)],
-            ["Sticks -> R", round(self.stick_passed_R, self.output_precision)],
-            ["Arc -> R", round(self.arc_R, self.output_precision)],
-            # ["", round(, self.output_precision)],
-            ["Wires -> U", round(self.wire_U, self.output_precision)],
-            ["Sticks -> U", round(self.stick_passed_U, self.output_precision)],
-            ["Arc -> U", round(self.arc_U, self.output_precision)],
-
-            ["Arc -> E", round(self.arc_E, self.output_precision)],
-            ["Arc -> length", round(self.stick_passed_length, self.output_precision)],
-            ["Wires -> Q/t", round(self.wire_Q_dt, self.output_precision)],
-            ["Arc -> H_max", round(self.arc_max_h, self.output_precision)]
+            ["Battery -> U", str(round(self.battery_U, self.output_precision)) + " В"],
+            ["Battery -> I", str(round(self.battery_I, self.output_precision)) + " A"],
+            ["Stick -> d", str(self.stick_d) + " м"],
+            ["Wires -> R", str(round(self.wire_R, self.output_precision)) + " Ом"],
+            ["Sticks -> R", str(round(self.stick_passed_R, self.output_precision)) + " Ом"],
+            ["Arc -> R", str(round(self.arc_R, self.output_precision)) + " Ом"],
+            ["Wires -> U", str(round(self.wire_U, self.output_precision)) + " В"],
+            ["Sticks -> U", str(round(self.stick_passed_U, self.output_precision)) + " В"],
+            ["Arc -> U", str(round(self.arc_U, self.output_precision)) + " В"],
+            ["Arc -> E", str(round(self.arc_start_E, self.output_precision)) + " В/м"],
+            ["Arc -> H_max", str(round(self.arc_max_h, self.output_precision)) + " м"],
         ]
 
     def set_precision(self, precision):

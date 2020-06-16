@@ -3,7 +3,6 @@ from pygame.locals import *
 from physics import Ladder
 from math import sqrt
 from math import tan
-from math import sin
 from math import pi
 
 
@@ -13,7 +12,6 @@ def input_from_file(filename):
     stick_angle = float(file.readline().split()[1])
     stick_d = float(file.readline().split()[1])
     battery_U = float(file.readline().split()[1])
-    battery_I = float(file.readline().split()[1])
 
     passed_line = file.readline()
 
@@ -30,7 +28,6 @@ def input_from_file(filename):
     ladder_object = Ladder(stick_angle,
                            stick_d,
                            battery_U,
-                           battery_I,
                            wire_length,
                            wire_p,
                            wire_S,
@@ -58,7 +55,7 @@ def calculate_lines(angle, start_pos1, start_pos2, length):
 
 def graphics():
 
-    slow = 5  # 20 * 10 ** 6  # замедление времени
+    slow = 10  # 20 * 10 ** 6  # замедление времени
     correction_factor = 1.43  # коэффициент, умножение на который даст сильно приближенное к реальному обновление времени в условиях программы, так как расчтеты производятся не мгновенно
     precision = 3  # точность вывода, количество знаков после запятой при выводе (рассчеты все равно проводятся с максимально возможной для Python3 точностью)
     start_pos_left = [774, 590]
@@ -111,14 +108,14 @@ def graphics():
 
         if started:
             # Добавляем на экран дугу (или не добавляем)
-            print("passed:", ladder.stick_passed_d)
+            print("passed:", ladder.stick_passed_length)
             print("h:", ladder.arc_h)
             pygame.draw.line(screen, PURPLE,
-                             [round(ladder.arc_start_position[0] - ladder.stick_passed_d * meter_div_by_pix),
-                              round(ladder.arc_start_position[1] + ladder.arc_h * meter_div_by_pix)
+                             [round(ladder.arc_start_position[0] - (ladder.delta_X * meter_div_by_pix + 20)),
+                              round(ladder.arc_start_position[1] - ladder.arc_h * meter_div_by_pix)
                               ],
-                             [round(ladder.arc_start_position[0] + ladder.stick_passed_d * meter_div_by_pix),
-                              round(ladder.arc_start_position[1] + ladder.arc_h * meter_div_by_pix)
+                             [round(ladder.arc_start_position[0] + (ladder.delta_X * meter_div_by_pix + 20)),
+                              round(ladder.arc_start_position[1] - ladder.arc_h * meter_div_by_pix)
                               ], 2)
 
             # Добавляем информацию о ней
@@ -132,7 +129,6 @@ def graphics():
             pygame.time.delay(delay)
 
             # Увеличиваем время
-            # t += 1
             t += (delay / 1000) * correction_factor / slow  # синхронизируемся с реальным временем
         else:
             screen.blit(start_img, (80, 360))

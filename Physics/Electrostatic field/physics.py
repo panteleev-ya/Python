@@ -17,12 +17,18 @@ class Object:
     precision = 7  # точность округления данных, константа, можно поменять, если очень надо
     world_size_x = [0, 800]  # размеры "мира" по оси Х
     world_size_y = [0, 400]  # размеры "мира" по оси Y
-    field_size_x = [0, 800]  # размеры электростатического поля по оси Х
+    field_size_x = [200, 800]  # размеры электростатического поля по оси Х
     field_size_y = [0, 400]  # размеры электростатического поля по оси Y
     field_E = 1  # напряженность поля, В/м
     field_direction = 1  # направление напряженности поля: 1 - вниз, 2 - вправо, 3 - вверх, 4 - влево
     K = 100  # количество пикселей в одном метре
     stopped = False
+    accelerated = False
+
+    # timers
+    t = 0  # общий таймер
+    help_timer = 0  # помогает подсчитать время действия силы
+    a_t = 0  # время действия поля, при котором существует ускорение
 
     # Конструктор с заданием начальных значений величин
     def __init__(self, start_position, start_velocity, mass, q, size, image, u, d, k=100):
@@ -68,6 +74,7 @@ class Object:
                 # F = qE, F = ma => ma = qE => a = qE/m
                 new_a = self.q / self.mass * self.field_E
                 new_a *= self.K  # переводим из м/с в пиксель/с
+                self.accelerated = True
                 if self.field_direction == 1:  # вниз -> увеличение Y
                     self.a[1] = new_a
                 elif self.field_direction == 2:  # вправо -> увеличение X
@@ -76,10 +83,14 @@ class Object:
                     self.a[1] = -new_a
                 elif self.field_direction == 4:  # влево -> уменьшение X
                     self.a[0] = -new_a
-        self.current_velocity[0] = self.start_velocity[0] + self.a[0] * t
-        self.current_velocity[1] = self.start_velocity[1] + self.a[1] * t
-        # self.current_velocity[0] += self.a[0]
-        # self.current_velocity[1] += self.a[1]
+        else:
+            self.accelerated = False
+            self.a = [0, 0]
+            self.start_velocity[0] = self.current_velocity[0]
+            self.start_velocity[1] = self.current_velocity[1]
+        self.a_t = t - self.help_timer
+        self.current_velocity[0] = self.start_velocity[0] + self.a[0] * self.a_t
+        self.current_velocity[1] = self.start_velocity[1] + self.a[1] * self.a_t
         self.round_data(self.precision)
 
     # Проверки на границы с миром
@@ -104,6 +115,8 @@ class Object:
     def update_position(self, t):
         if self.stopped:
             return
+        if not self.accelerated:
+            self.help_timer = t
         self.update_velocity(t)
         # Считаем новую позицию объекта
         # X = X0 + V0*t + a*t^2/2
@@ -112,8 +125,8 @@ class Object:
         #     self.current_position[1] + self.start_velocity[1] + self.a[1] / 2
         # ]
         new_position = [
-            self.start_position[0] + self.start_velocity[0] * t + self.a[0] * t * t / 2,
-            self.start_position[1] + self.start_velocity[1] * t + self.a[1] * t * t / 2
+            self.start_position[0] + self.start_velocity[0] * t + self.a[0] * self.a_t * self.a_t / 2,
+            self.start_position[1] + self.start_velocity[1] * t + self.a[1] * self.a_t * self.a_t / 2
         ]
         # Позиция не изменилась - заканчиваем
         if new_position == self.current_position:

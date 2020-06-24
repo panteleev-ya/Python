@@ -9,7 +9,7 @@ def graphics():
     # Зададим масштаб (отношение длины метра к длине пикселя)
     # Зная, сколько пикселей в одном метре - можно переводить скорость из м/с в пиксель/с
     meter_div_by_pixel = 100  # количество пикселей в одном метре
-    slow = 20 * 10 ** 6  # замедление времени
+    slow = 6 * 10 ** 6  # замедление времени
 
     # Объявляем объект частицы
     world_size = [
@@ -98,10 +98,14 @@ def graphics():
             for i in range(len(writable)):
                 screen.blit(font.render(writable[i], 1, BLACK), (810, 80 + i * 25))
 
+            # print(particle.help_timer, t - particle.help_timer)
+
             # Обновляем ее состояние
             particle.update_position(t)
             pygame.display.update()
             pygame.time.delay(delay)
+
+            # print(particle.help_timer, t - particle.help_timer)
 
             # Увеличиваем время
             # t += 1

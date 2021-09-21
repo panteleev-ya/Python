@@ -13,7 +13,7 @@ world = World(world_size, collision_type)  # задаем миру размер�
 # mass_rate = 3
 
 small_cube_start_position = 100
-small_cube_mass = 1
+small_cube_mass = 3
 small_cube_start_velocity = 0  # маленький куб стоит на месте
 small_cube_image = pygame.image.load('small_cube.png')
 small_cube_size = (60, 60)
@@ -25,7 +25,7 @@ small_cube = Object(small_cube_start_position,  # создали объект п
 world.add_object(small_cube)
 
 big_cube_start_position = 100 + 100 + small_cube.size_x  # двойное расстояние + размер первого куба для наглядности
-big_cube_mass = 5
+big_cube_mass = 15
 big_cube_start_velocity = -1  # большой куб двигается по направлению к маленькому
 big_cube_image = pygame.image.load('big_cube.png')
 big_cube_size = (120, 120)

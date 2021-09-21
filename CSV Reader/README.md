@@ -1,3 +1,0 @@
-# Python Projects
-* CSV Reader:
-  + 

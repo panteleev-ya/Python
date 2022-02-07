@@ -1,2 +1,9 @@
 baron_simon/*
+goose/*
+goose_urls.txt
+best_stickers/*
+best_stickers_urls.txt
 baron_simon_urls.txt
+tg_bot/aiogram_tg_bot/__pycache__
+tg_bot/aiogram_tg_bot/token.txt
+tg_bot/regular_bot/token.txt

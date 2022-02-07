@@ -2,8 +2,9 @@ import os
 import requests
 from pathlib import Path
 
-directory = "baron_simon/"
-filename = f"{directory}_urls.txt"
+directory = "best_stickers/"
+# filename = f"{directory[:-1]}_urls.txt"
+filename = f"ura_urls.txt"
 _format = ".png"
 
 urls = open(filename, "r").readlines()

@@ -1,6 +1,6 @@
-filename = "baron_simon_urls.txt"
-id_start = 58821
-id_end = 58868
+filename = "ura_urls.txt"
+id_start = 52691
+id_end = 52691
 param = 1
 size = 512
 url = "https://vk.com/sticker/"

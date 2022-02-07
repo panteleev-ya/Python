@@ -14,7 +14,7 @@
 
 **Плюсы:** Бот работает стабильно, сервера Телеграма меньше нагружаются, сам бот меньше нагружает систему  
 **Минусы:** Необходима реализация API, а также запуск бота удаленно на сервере
-##Подключение необходимых библиотек
+## Подключение необходимых библиотек
 ```Python
 from aiogram import Bot, types  # Подключает класс Бота и "типы"
 from aiogram.dispatcher import Dispatcher  # Подключает диспетчера сообщений для бота
@@ -107,7 +107,7 @@ keyboard_hi = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True, 
 ```Python
 button_hi = KeyboardButton('Привет!')
 ```
-####Добавление кнопок
+#### Добавление кнопок
 **.add(\*args)**
 ```Python
 keyboard_hi.add(button_hi)

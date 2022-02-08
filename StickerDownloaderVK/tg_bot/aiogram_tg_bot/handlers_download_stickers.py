@@ -15,7 +15,6 @@ class FSMDownloadStickers(StatesGroup):
     id_first_input = State()        # List -> Step 2
     id_input = State()              # List -> Step 2
     size_input = State()            # Step 3
-    # done = State()                # Done!
 
 
 # /download - задаем состояние "выбор способа", предлагаем варианты для выбора
@@ -125,7 +124,6 @@ async def size_input_handler(message: types.Message, state: FSMContext):
 
         # Достаём из хранилища собранные данные
         async with state.proxy() as data:
-            # data_hash = data.values()
             data_hash = data
 
         # Генерируем URL-адреса

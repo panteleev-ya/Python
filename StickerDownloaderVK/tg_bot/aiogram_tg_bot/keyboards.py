@@ -1,5 +1,4 @@
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 # /download клавиатура
 range_download_text = "Скачать стикер-пак целиком"

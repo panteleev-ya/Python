@@ -19,8 +19,8 @@ if __name__ == '__main__':
     # Registering handlers
     register_handlers_admin(dp)
     register_handlers_subscribe(dp)
-    register_handlers_other(dp)
     register_handlers_support(dp)
+    register_handlers_other(dp)
 
     # Running Bot by LongPolling => infinity looping the program
     # skip_updates=True means that bot will not answer on messages, that he got while being offline

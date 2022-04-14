@@ -32,7 +32,7 @@ async def apply_payment_handler(message: types.Message):
             # Sending message that current user payment got applied
             # ... to current user
             user_msg = f"""
-            Ваш платеж подтвержден, данные аккаунта уже в вашем личном кабинете!\nНапишите /home чтобы попасть в личный кабинет
+            Ваш платеж подтвержден!\nНапишите /info чтобы узнать все о вашей подписке
             """
             await bot.send_message(users[username]['user_id'], user_msg)
 

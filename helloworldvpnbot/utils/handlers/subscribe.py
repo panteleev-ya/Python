@@ -10,8 +10,10 @@ from utils.locals.data.keyboards import *
 from utils.locals.data.subscription_options import prices, subscription_durations
 from utils.locals.data.admins import admin_chat_id
 from utils.locals.data.bot_init import bot
+from utils.locals.data.servers import server_ip
 
 from utils.messages.subscribe import *
+from utils.messages.other import not_an_option_message
 
 from utils.locals.data.users import users, save_users
 
@@ -38,8 +40,8 @@ async def register_user_handler(message: types.Message, state: FSMContext):
         username = str(message.from_user.username)
         if username in users:
             # If it does exist - asking if he wants to renew the subscription
-            await message.reply(user_already_exist_message)
-            # TODO state renew instead of "error" message
+            await SubscribeUserFSM.renew_subscription.set()
+            await message.reply(user_already_exist_message, reply_markup=yes_no_keyboard)
         else:
             # Making new user in memory storage
             data[username] = {
@@ -47,6 +49,7 @@ async def register_user_handler(message: types.Message, state: FSMContext):
                 'login': '',
                 'password': '',
                 'server': '',
+                'server_ip': '',
                 'exp_year': -1,
                 'exp_month': -1,
                 'exp_day': -1,
@@ -62,7 +65,22 @@ async def register_user_handler(message: types.Message, state: FSMContext):
             await message.answer(choose_server_message, reply_markup=servers_keyboard)
 
 
-# TODO add /renew handler
+# / renew
+# Renewing the subscription
+async def renew_subscription_handler(message: types.Message, state: FSMContext):
+    await SubscribeUserFSM.choose_subscription_duration.set()
+
+    # Answering user
+    await message.reply(choose_subscription_duration_message, reply_markup=subscription_durations_keyboard)
+
+
+# Cancel renew operation
+async def cancel_renew_handler(message: types.Message, state: FSMContext):
+    current_state = await state.get_state()
+    if current_state is not None:
+        await state.finish()
+        await message.reply(operation_canceled_message, reply_markup=types.ReplyKeyboardRemove())
+
 
 # State = Choose server
 # Choosing server, going to state Choose subscription duration
@@ -73,6 +91,7 @@ async def choose_server_handler(message: types.Message, state: FSMContext):
         async with state.proxy() as data:
             # Setting server for user in memory storage
             data[username]['server'] = message.text
+            data[username]['server_ip'] = server_ip[message.text]
 
         # Setting Choose subscription duration state
         await SubscribeUserFSM.choose_subscription_duration.set()
@@ -89,22 +108,36 @@ async def choose_subscribe_duration_handler(message: types.Message, state: FSMCo
     if message.text in subscription_durations_texts:
         username = str(message.from_user.username)
         async with state.proxy() as data:
-            if data[username]['exp_year'] == -1:
+            if username in users and users[username]['exp_year'] != -1:
+                # If its renewing subscription
+                now = datetime.date(users[username]['exp_year'], users[username]['exp_month'],
+                                    users[username]['exp_day'])
+
+                # If it's not renewing in time
+                if now < datetime.datetime.now():
+                    now = datetime.datetime.now()
+
+                # Counting expiration date
+                delta = timedelta(days=subscription_durations[message.text])
+                expiration_date = now + delta
+
+                # Setting expiration date in memory storage
+                users[username]['exp_year'] = int(expiration_date.year)
+                users[username]['exp_month'] = int(expiration_date.month)
+                users[username]['exp_day'] = int(expiration_date.day)
+            else:
                 # If its new subscription
                 now = datetime.datetime.now()
-            else:
-                # If its renewing subscription
-                now = datetime.date(data[username]['exp_year'], data[username]['exp_month'], data[username]['exp_day'])
 
-            # Counting expiration date
-            delta = timedelta(days=subscription_durations[message.text])
-            expiration_date = now + delta
+                # Counting expiration date
+                delta = timedelta(days=subscription_durations[message.text])
+                expiration_date = now + delta
 
-            # Setting expiration date in memory storage
-            data[username]['exp_year'] = int(expiration_date.year)
-            data[username]['exp_month'] = int(expiration_date.month)
-            data[username]['exp_day'] = int(expiration_date.day)
-            users[username] = data[username]
+                # Setting expiration date in memory storage
+                data[username]['exp_year'] = int(expiration_date.year)
+                data[username]['exp_month'] = int(expiration_date.month)
+                data[username]['exp_day'] = int(expiration_date.day)
+                users[username] = data[username]
 
         # Saving users
         save_users(users)
@@ -136,6 +169,10 @@ def register_handlers_subscribe(_dp: Dispatcher):
     # State=None
     # /subscribe
     _dp.register_message_handler(register_user_handler, commands=['subscribe'], state=None)
+    # /renew and its cancelling
+    _dp.register_message_handler(renew_subscription_handler, commands=['renew'], state=None)
+    _dp.register_message_handler(renew_subscription_handler, filters.Text(contains=['Да'], ignore_case=True), state=SubscribeUserFSM.renew_subscription)
+    _dp.register_message_handler(cancel_renew_handler, filters.Text(contains=['Нет'], ignore_case=True), state=SubscribeUserFSM.renew_subscription)
 
     # State=* (any state)
     # Setting any state into State=None if its cancelled

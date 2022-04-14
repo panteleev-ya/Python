@@ -12,7 +12,6 @@ hardcoded_subscribe_durations = {
 }
 options['durations'] = hardcoded_subscribe_durations
 store_json("utils/storage/subscription_options.json", options)
-options = load_from_json("utils/storage/subscription_options.json")
 
 prices = options['price']
 subscription_durations = options['durations']

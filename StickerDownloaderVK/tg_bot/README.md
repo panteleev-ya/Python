@@ -169,10 +169,7 @@ class FSMDownloadStickers(StatesGroup):
     id_input = State()              # List -> Step 2
     size_input = State()            # Step 3 + finish
 ```
-Данный автомат имеет 6 состояний - это не значит, что шагов по выполнению задачи тоже 6. Шагов всего 4 - это количество 
-"слоев" алгоритма, а состояния - это его "узлы". Картинка, иллюстрирующая алгоритм:  
-<img height="80%" src="D:\DiskApps\Programming\GitRepos\Python-projects\StickerDownloaderVK\tg_bot\aiogram_tg_bot\md_src\state_machine.png" width="80%"/>  
-Красным пронумерованы все состояния (_state_), а зеленым обведены слои алгоритма (_stpes_)
+Данный автомат имеет 6 состояний
 ### Создание конечного автомата
 ```Python
 # Подключение классов Автомата, Состояния и ГруппыСостояний

@@ -27,9 +27,9 @@ from utils.locals.data.users import users, save_users
 #             ->  No: State=Choose server -> State=Choose subscription duration
 
 class SubscribeUserFSM(StatesGroup):
-    choose_server = State()                     # Choose server
-    choose_subscription_duration = State()      # Choose subscription duration
-    renew_subscription = State()                # Renew existing subscription
+    choose_server = State()  # Choose server
+    choose_subscription_duration = State()  # Choose subscription duration
+    renew_subscription = State()  # Renew existing subscription
 
 
 # /subscribe
@@ -110,8 +110,8 @@ async def choose_subscribe_duration_handler(message: types.Message, state: FSMCo
         async with state.proxy() as data:
             if username in users and users[username]['exp_year'] != -1:
                 # If its renewing subscription
-                now = datetime.date(users[username]['exp_year'], users[username]['exp_month'],
-                                    users[username]['exp_day'])
+                now = datetime.datetime(users[username]['exp_year'], users[username]['exp_month'],
+                                        users[username]['exp_day'])
 
                 # If it's not renewing in time
                 if now < datetime.datetime.now():
@@ -147,7 +147,7 @@ async def choose_subscribe_duration_handler(message: types.Message, state: FSMCo
 
         # Answering user
         price = users[username]['price']
-        await message.reply(f"Пожалуйста, оплатите подписку по кнопке ниже.\nСтоимость: {price} руб")
+        await message.reply(f"Пожалуйста, оплатите подписку по кнопке ниже.\nСтоимость: {price} руб", reply_markup=types.ReplyKeyboardRemove())
         await message.answer(payment_requisites, reply_markup=payment_inline_keyboard)
 
         # Setting finish state
@@ -171,8 +171,10 @@ def register_handlers_subscribe(_dp: Dispatcher):
     _dp.register_message_handler(register_user_handler, commands=['subscribe'], state=None)
     # /renew and its cancelling
     _dp.register_message_handler(renew_subscription_handler, commands=['renew'], state=None)
-    _dp.register_message_handler(renew_subscription_handler, filters.Text(contains=['Да'], ignore_case=True), state=SubscribeUserFSM.renew_subscription)
-    _dp.register_message_handler(cancel_renew_handler, filters.Text(contains=['Нет'], ignore_case=True), state=SubscribeUserFSM.renew_subscription)
+    _dp.register_message_handler(renew_subscription_handler, filters.Text(contains=['Да'], ignore_case=True),
+                                 state=SubscribeUserFSM.renew_subscription)
+    _dp.register_message_handler(cancel_renew_handler, filters.Text(contains=['Нет'], ignore_case=True),
+                                 state=SubscribeUserFSM.renew_subscription)
 
     # State=* (any state)
     # Setting any state into State=None if its cancelled
@@ -181,4 +183,5 @@ def register_handlers_subscribe(_dp: Dispatcher):
 
     # Subscribing states handlers
     _dp.register_message_handler(choose_server_handler, content_types=['text'], state=SubscribeUserFSM.choose_server)
-    _dp.register_message_handler(choose_subscribe_duration_handler, content_types=['text'], state=SubscribeUserFSM.choose_subscription_duration)
+    _dp.register_message_handler(choose_subscribe_duration_handler, content_types=['text'],
+                                 state=SubscribeUserFSM.choose_subscription_duration)

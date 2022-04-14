@@ -9,7 +9,6 @@ def get_account():
     account = list(accounts['free'][0])
     accounts['free'].remove(accounts['free'][0])
     accounts['busy'].append(account)
-    # TEST: not saving 'busy' accounts into json
-    # PROD: uncomment
+    # TODO uncomment this line for PROD
     # store_json("utils/storage/accounts.json", accounts)
     return account

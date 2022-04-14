@@ -21,7 +21,7 @@ def create_reply_keyboard(texts, has_cancel=False, width=1):
 # Creating InlineKeyboardMarkup
 def create_inline_keyboard(texts_urls):
     buttons = []
-    for text, url in texts_urls:
-        buttons.append([InlineKeyboardButton(text=text, url=url)])
-    keyboard = InlineKeyboardMarkup(buttons)
+    for _text, _url in texts_urls:
+        buttons.append(InlineKeyboardButton(text=_text, url=_url))
+    keyboard = InlineKeyboardMarkup().add(*buttons)
     return keyboard

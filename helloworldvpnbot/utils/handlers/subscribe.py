@@ -50,7 +50,7 @@ async def register_user_handler(message: types.Message, state: FSMContext):
                 'exp_year': -1,
                 'exp_month': -1,
                 'exp_day': -1,
-                'price_next_time': prices['default'],
+                'price': prices['default'],
                 'paid': 0
             }
 
@@ -112,11 +112,13 @@ async def choose_subscribe_duration_handler(message: types.Message, state: FSMCo
         # Sending alert message in admins chat
         await bot.send_message(admin_chat_id, f"{username} : ожидается оплата")
 
+        # Answering user
+        price = users[username]['price']
+        await message.reply(f"Пожалуйста, оплатите подписку по кнопке ниже.\nСтоимость: {price} руб")
+        await message.answer(payment_requisites, reply_markup=payment_inline_keyboard)
+
         # Setting finish state
         await state.finish()
-
-        # Answering user
-        await message.reply(payment_requisites, reply_markup=payment_inline_keyboard)
     else:
         await message.reply(not_an_option_message)
 

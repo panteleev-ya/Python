@@ -21,4 +21,4 @@ payment_buttons = [
     ["Оплатить картой", "https://www.tinkoff.ru/rm/panteleev.yaroslav8/j6ZHY46844"],
     # ["Оплатить криптовалютой", "кошелек"]
 ]
-payment_inline_keyboard = create_inline_keyboard()
+payment_inline_keyboard = create_inline_keyboard(texts_urls=payment_buttons)

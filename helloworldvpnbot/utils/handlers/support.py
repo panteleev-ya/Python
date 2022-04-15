@@ -19,7 +19,7 @@ class GuideFSM(StatesGroup):
 # /certificate
 # Sending CA-certificate to user
 async def get_cert_handler(message: types.Message):
-    await message.answer_document(open("utils/new_cert.pem", "rb"), caption="Ваш сертификат доступа")
+    await message.answer_document(open("utils/vpn_cert.pem", "rb"), caption="Ваш сертификат доступа")
 
 
 # /faq

@@ -5,8 +5,6 @@ from utils.locals.data.bot_init import bot
 from utils.locals.data.users import users, save_users
 from utils.locals.data.admins import admin_chat_id
 
-from utils.filters.admin import AdminApplyPayment
-
 
 # Manually applying user payment
 async def apply_payment_handler(message: types.Message):
@@ -53,4 +51,4 @@ async def apply_payment_handler(message: types.Message):
 
 # Registering handlers function
 def register_handlers_admin(_dp: Dispatcher):
-    _dp.register_message_handler(apply_payment_handler, AdminApplyPayment())
+    _dp.register_message_handler(apply_payment_handler, commands=['apply'])

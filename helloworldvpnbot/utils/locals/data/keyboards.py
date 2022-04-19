@@ -37,3 +37,13 @@ os_texts = [
     "Windows"
 ]
 os_keyboard = create_reply_keyboard(texts=os_texts)
+
+# Prev-Cancel-Next keyboard
+prev_next_menu_texts = [
+    "Назад",
+    "Далее",
+    "Вернуться в меню"
+]
+prev_next_menu_keyboard = create_reply_keyboard(texts=prev_next_menu_texts, width=2)
+next_menu_keyboard = create_reply_keyboard(texts=prev_next_menu_texts[1:], width=2)
+prev_menu_keyboard = create_reply_keyboard(texts=[prev_next_menu_texts[0]]+[prev_next_menu_texts[-1]], width=2)

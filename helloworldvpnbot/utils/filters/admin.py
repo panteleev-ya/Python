@@ -7,9 +7,8 @@ from utils.locals.data.admins import is_admin
 # Filters for admin commands
 
 # Manually applying user payment filter
-class AdminApplyPayment(Filter):
-    key = "admin_apply"
+class NotAdmin(Filter):
+    key = "not_admin"
 
     async def check(self, message: types.Message):
-        commands = ['/apply']
-        return is_admin(message.from_user.username) and message.text.split()[0] in commands
+        return not is_admin(message.from_user.username)

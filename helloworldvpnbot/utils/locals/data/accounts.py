@@ -9,6 +9,5 @@ def get_account():
     account = list(accounts['free'][0])
     accounts['free'].remove(accounts['free'][0])
     accounts['busy'].append(account)
-    # TODO uncomment this line for PROD
-    # store_json("utils/storage/accounts.json", accounts)
+    store_json("utils/storage/accounts.json", accounts)
     return account

@@ -38,12 +38,24 @@ os_texts = [
 ]
 os_keyboard = create_reply_keyboard(texts=os_texts)
 
-# Prev-Cancel-Next keyboard
+# Guide steps keyboards
+next_step_text = "Следующий шаг"
+prev_step_text = "Предыдущий шаг"
+cancel_guide_text = "Вернуться в меню"
 prev_next_menu_texts = [
-    "Назад",
-    "Далее",
-    "Вернуться в меню"
+    next_step_text,
+    prev_step_text,
+    cancel_guide_text
 ]
-prev_next_menu_keyboard = create_reply_keyboard(texts=prev_next_menu_texts, width=2)
-next_menu_keyboard = create_reply_keyboard(texts=prev_next_menu_texts[1:], width=2)
-prev_menu_keyboard = create_reply_keyboard(texts=[prev_next_menu_texts[0]]+[prev_next_menu_texts[-1]], width=2)
+next_menu_texts = [
+    next_step_text,
+    cancel_guide_text
+]
+prev_menu_texts = [
+    prev_step_text,
+    cancel_guide_text
+]
+
+prev_next_menu_keyboard = create_reply_keyboard(texts=prev_next_menu_texts)
+next_menu_keyboard = create_reply_keyboard(texts=next_menu_texts)
+prev_menu_keyboard = create_reply_keyboard(texts=prev_menu_texts)

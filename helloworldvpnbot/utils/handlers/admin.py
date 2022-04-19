@@ -5,6 +5,8 @@ from utils.locals.data.bot_init import bot
 from utils.locals.data.users import users, save_users
 from utils.locals.data.admins import admin_chat_id
 
+from utils.messages.admin import *
+
 
 # Manually applying user payment
 async def apply_payment_handler(message: types.Message):
@@ -29,21 +31,12 @@ async def apply_payment_handler(message: types.Message):
 
             # Sending message that current user payment got applied
             # ... to current user
-            user_msg = f"""
-            Ваш платеж подтвержден!\nНапишите /info чтобы узнать все о вашей подписке
-            """
-            await bot.send_message(users[username]['user_id'], user_msg)
+            await bot.send_message(users[username]['user_id'], payment_applied_message)
 
             # ... to admins chat
-            msg = f"""
-            {username} : платеж успешно подтвержден
-            """
-            await bot.send_message(admin_chat_id, msg, reply_markup=types.ReplyKeyboardRemove())
+            await bot.send_message(admin_chat_id, f"`{username}`\n-> Платеж успешно подтвержден", reply_markup=types.ReplyKeyboardRemove(), parse_mode='markdown')
         else:
-            msg = f"""
-            {username} нет в списке пользователей!
-            """
-            await bot.send_message(admin_chat_id, msg, reply_markup=types.ReplyKeyboardRemove())
+            await bot.send_message(admin_chat_id, f"`{username}`\n-> Нет в списке пользователей!", reply_markup=types.ReplyKeyboardRemove(), parse_mode='markdown')
 
     # Saving result
     save_users(users)

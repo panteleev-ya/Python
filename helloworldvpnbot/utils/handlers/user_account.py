@@ -1,6 +1,7 @@
 from aiogram import types, Dispatcher
 
 from utils.locals.data.users import users
+from utils.messages.user_account import *
 
 
 # /certificate
@@ -12,7 +13,7 @@ async def get_cert_handler(message: types.Message):
 
 # /faq
 async def faq_handler(message: types.Message):
-    await message.answer("Нет вопросов - нет ответов🤠🤠🤠.\nВопросы задавайте [администратору](t.me/monokumato)🥳🥳🥳", parse_mode='markdown')
+    await message.answer(faq_message, parse_mode='markdown')
 
 
 # /info

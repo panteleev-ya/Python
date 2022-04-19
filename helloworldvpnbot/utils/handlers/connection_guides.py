@@ -9,6 +9,8 @@ from utils.messages.connection_guides import *
 from utils.locals.data.photos_id import *
 
 # Info for sending and deleting guide messages
+from utils.messages.other import not_an_option_message
+
 current_step_id = -1
 current_steps_number = -1
 current_guide_messages = []
@@ -29,7 +31,7 @@ class ShowGuideFSM(StatesGroup):
 
 async def connect_command_handler(message: types.Message, state: FSMContext):
     await ChooseOSTypeFSM.choosing_os_type.set()
-    await message.reply(ask_guide_message, reply_markup=os_keyboard)
+    await message.reply(ask_guide_message, reply_markup=os_keyboard, parse_mode='markdown')
 
 
 async def choose_os_guide_handler(message: types.Message, state: FSMContext):
@@ -55,7 +57,7 @@ async def choose_os_guide_handler(message: types.Message, state: FSMContext):
         current_guide_photos = ios_guide_photos
         current_steps_number = 4
     else:
-        await message.answer("Такого варианта ответа нет! Пожалуйста, выберите вариант ответа на встроенной клавиатуре☺")
+        await message.answer(not_an_option_message, parse_mode='markdown')
         return
 
     # Setting ShowGuide state
@@ -76,14 +78,14 @@ async def show_guide_handler(message: types.Message, state: FSMContext):
     global prev_guide_text_msg, prev_guide_screenshots_msg
 
     # Setting prev or next state
-    if message.text == "Назад":
+    if message.text == prev_step_text:
         if current_step_id > 0:
             current_step_id -= 1
         else:
             # Closing guide
             await cancel_guide_handler(message=message, state=state)
             return
-    elif message.text == "Далее":
+    elif message.text == next_step_text:
         if current_step_id < current_steps_number - 1:
             current_step_id += 1
         else:
@@ -135,16 +137,16 @@ async def cancel_guide_handler(message: types.Message, state: FSMContext):
         if cert_msg is not None and info_msg is not None:
             await cert_msg.delete()
             await info_msg.delete()
-        await message.reply("Гайд закрыт!", reply_markup=types.ReplyKeyboardRemove())
+        await message.reply(guide_finish_message, reply_markup=types.ReplyKeyboardRemove(), parse_mode='markdown')
 
 
 def register_handlers_connection_guides(_dp: Dispatcher):
     # Stop using guide
-    _dp.register_message_handler(cancel_guide_handler, filters.Text(contains=['Вернуться в меню'], ignore_case=True), state=ShowGuideFSM.show)
+    _dp.register_message_handler(cancel_guide_handler, filters.Text(contains=[cancel_guide_text], ignore_case=True), state=ShowGuideFSM.show)
 
     # Choose OS
     _dp.register_message_handler(connect_command_handler, commands=['connect'], state=None)
     _dp.register_message_handler(choose_os_guide_handler, content_types=['text'], state=ChooseOSTypeFSM.choosing_os_type)
 
     # Show guide
-    _dp.register_message_handler(show_guide_handler, filters.Text(contains=['Далее'], ignore_case=True) | filters.Text(contains=['Назад'], ignore_case=True), state=ShowGuideFSM.show)
+    _dp.register_message_handler(show_guide_handler, filters.Text(contains=[next_step_text], ignore_case=True) | filters.Text(contains=[prev_step_text], ignore_case=True), state=ShowGuideFSM.show)

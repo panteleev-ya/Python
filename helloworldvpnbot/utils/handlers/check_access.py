@@ -14,7 +14,7 @@ admin_commands = ['apply', 'photo_id', 'send_photo']
 
 # No access to commands handler
 async def no_access_handler(message: types.Message):
-    await message.reply(no_access_message)
+    await message.reply(no_access_message, parse_mode='markdown')
 
 
 def register_handlers_check_access(_dp: Dispatcher):

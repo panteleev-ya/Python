@@ -41,7 +41,7 @@ async def register_user_handler(message: types.Message, state: FSMContext):
         if username in users:
             # If it does exist - asking if he wants to renew the subscription
             await SubscribeUserFSM.renew_subscription.set()
-            await message.reply(user_already_exist_message, reply_markup=yes_no_keyboard)
+            await message.reply(user_already_exist_message, reply_markup=yes_no_keyboard, parse_mode='markdown')
         else:
             # Making new user in memory storage
             data[username] = {
@@ -61,8 +61,8 @@ async def register_user_handler(message: types.Message, state: FSMContext):
             await SubscribeUserFSM.choose_server.set()
 
             # Answering user
-            await message.answer(register_user_message, reply_markup=types.ReplyKeyboardRemove())
-            await message.answer(choose_server_message, reply_markup=servers_keyboard)
+            await message.answer(register_user_message, reply_markup=types.ReplyKeyboardRemove(), parse_mode='markdown')
+            await message.answer(choose_server_message, reply_markup=servers_keyboard, parse_mode='markdown')
 
 
 # / renew
@@ -71,7 +71,7 @@ async def renew_subscription_handler(message: types.Message, state: FSMContext):
     await SubscribeUserFSM.choose_subscription_duration.set()
 
     # Answering user
-    await message.reply(choose_subscription_duration_message, reply_markup=subscription_durations_keyboard)
+    await message.reply(choose_subscription_duration_message, reply_markup=subscription_durations_keyboard, parse_mode='markdown')
 
 
 # Cancel renew operation
@@ -79,7 +79,7 @@ async def cancel_renew_handler(message: types.Message, state: FSMContext):
     current_state = await state.get_state()
     if current_state is not None:
         await state.finish()
-        await message.reply(operation_canceled_message, reply_markup=types.ReplyKeyboardRemove())
+        await message.reply(operation_canceled_message, reply_markup=types.ReplyKeyboardRemove(), parse_mode='markdown')
 
 
 # State = Choose server
@@ -97,9 +97,9 @@ async def choose_server_handler(message: types.Message, state: FSMContext):
         await SubscribeUserFSM.choose_subscription_duration.set()
 
         # Answering user
-        await message.reply(choose_subscription_duration_message, reply_markup=subscription_durations_keyboard)
+        await message.reply(choose_subscription_duration_message, reply_markup=subscription_durations_keyboard, parse_mode='markdown')
     else:
-        await message.reply(not_an_option_message)
+        await message.reply(not_an_option_message, parse_mode='markdown')
 
 
 # State = Choose subscription duration
@@ -143,17 +143,17 @@ async def choose_subscribe_duration_handler(message: types.Message, state: FSMCo
         save_users(users)
 
         # Sending alert message in admins chat
-        await bot.send_message(admin_chat_id, f"{username} : ожидается оплата")
+        await bot.send_message(admin_chat_id, f"`{username}`\n-> Ожидается оплата", parse_mode='markdown')
 
         # Answering user
         price = users[username]['price']
-        await message.reply(f"Пожалуйста, оплатите подписку по кнопке ниже.\nСтоимость: {price} руб", reply_markup=types.ReplyKeyboardRemove())
-        await message.answer(payment_requisites, reply_markup=payment_inline_keyboard)
+        await message.reply(f"Пожалуйста, оплатите подписку по кнопке ниже.\nСтоимость: {price} руб", reply_markup=types.ReplyKeyboardRemove(), parse_mode='markdown')
+        await message.answer(payment_requisites, reply_markup=payment_inline_keyboard, parse_mode='markdown')
 
         # Setting finish state
         await state.finish()
     else:
-        await message.reply(not_an_option_message)
+        await message.reply(not_an_option_message, parse_mode='markdown')
 
 
 # /cancel
@@ -162,7 +162,7 @@ async def cancel_handler(message: types.Message, state: FSMContext):
     current_state = await state.get_state()
     if current_state is not None:
         await state.finish()
-        await message.reply(operation_canceled_message, reply_markup=types.ReplyKeyboardRemove())
+        await message.reply(operation_canceled_message, reply_markup=types.ReplyKeyboardRemove(), parse_mode='markdown')
 
 
 def register_handlers_subscribe(_dp: Dispatcher):

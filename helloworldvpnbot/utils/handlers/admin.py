@@ -1,4 +1,5 @@
 from aiogram import types, Dispatcher
+# from aiogram.types import ContentType
 
 from utils.locals.data.accounts import get_account
 from utils.locals.data.bot_init import bot
@@ -42,6 +43,21 @@ async def apply_payment_handler(message: types.Message):
     save_users(users)
 
 
+# # Returning photo ID if photo got sent
+# async def return_photo_id(message: types.Message):
+#     photo_id = max(message.photo, key=lambda x: x.height).file_id
+#     await message.answer(f"Photo ID is: `{photo_id}`", parse_mode='markdown')
+#     await message.delete()
+#
+#
+# # Sending photo by id
+# async def send_photo_by_id(message: types.Message):
+#     photo_id = "AgACAgIAAx0CaVbYGQADAmJcSi3MdR8e0y9Kv-A9Zvmr81CSAAJ-vDEb_HDgSnmSqKwyMpEYAQADAgADeQADJAQ"
+#     await message.answer_photo(photo_id)
+
+
 # Registering handlers function
 def register_handlers_admin(_dp: Dispatcher):
     _dp.register_message_handler(apply_payment_handler, commands=['apply'])
+    # _dp.register_message_handler(send_photo_by_id, commands=['send_photo'])
+    # _dp.register_message_handler(return_photo_id, content_types=[ContentType.PHOTO])

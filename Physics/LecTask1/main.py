@@ -34,8 +34,8 @@ meander_values = meander(
 )
 
 x_labels = list(range(len(meander_values)))
-plt.plot(x_labels, meander_values)
-plt.xlabel("Time")
-plt.ylabel("Value")
-plt.title(f"Word: {word}")
+plt.plot(x_labels, meander_values, color='green')
+plt.ylabel("Значение")
+plt.xlabel("Время")
+plt.title(f"Слово: {word}")
 plt.show()

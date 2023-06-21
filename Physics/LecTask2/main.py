@@ -30,7 +30,7 @@ def round_complex(x, precision=10):
 
 def vector_point_to_bloch_angles(vector_points):
     """
-    Преобразует точки вектора в углы Эйлера на сфере Блоха.
+    Преобразует точки вектора в углы на сфере Блоха.
 
     :param vector_points: точки вектора
     :return: углы theta и phi на сфере Блоха
@@ -40,7 +40,7 @@ def vector_point_to_bloch_angles(vector_points):
 
 def bloch_angles_to_vector_point(theta, phi):
     """
-    Преобразует углы Эйлера на сфере Блоха в точки вектора.
+    Преобразует углы на сфере Блоха в точки вектора.
 
     :param theta: угол theta
     :param phi: угол phi

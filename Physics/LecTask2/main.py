@@ -63,20 +63,6 @@ def point_coords_by_angles(theta, phi):
     return np.array([x, y, z])
 
 
-def point_on_sphere(i, j, r0, R, phi):
-    """
-    Вычисляет координаты точки на сфере с центром в r0 и радиусом R.
-
-    :param i: координата i
-    :param j: координата j
-    :param r0: центр сферы
-    :param R: радиус сферы
-    :param phi: угол phi
-    :return: координаты точки на сфере
-    """
-    return r0 + R * cos(phi) * i + R * sin(phi) * j
-
-
 def normalize_vector(v):
     """
     Нормализует вектор.
@@ -108,7 +94,7 @@ def rotation_trace_points(n, A, B, alpha, total_points=50):
         r0 = A - R * (cos(alpha / 2) * i + sin(alpha / 2) * j)
 
     angles = np.linspace(-alpha / 2, alpha / 2, total_points)
-    points = [point_on_sphere(i, j, r0, R, phi) for phi in angles]
+    points = [r0 + R * cos(phi) * i + R * sin(phi) * j for phi in angles]
 
     return points
 
@@ -191,23 +177,21 @@ U = expm(-1j * alpha / 2 * (nx * pauli_x() + ny * pauli_y() + nz * pauli_z()))
 start_vector_point = bloch_angles_to_vector_point(start_theta, start_phi)
 end_vector_point = np.dot(U, start_vector_point)
 
-theta, phi = vector_point_to_bloch_angles(start_vector_point)
-start_point = point_coords_by_angles(theta, phi)
+start_point = point_coords_by_angles(start_theta, start_phi)
+end_theta, end_phi = vector_point_to_bloch_angles(end_vector_point)
+end_point = point_coords_by_angles(end_theta, end_phi)
 
 print()
 print('Начало вектора')
-print(f'θ: {format_angle_for_view(theta)}')
-print(f'φ: {format_angle_for_view(phi)}')
+print(f'θ: {format_angle_for_view(start_theta)}')
+print(f'φ: {format_angle_for_view(start_phi)}')
 print(f'Точка: {format_vector_point(start_vector_point)}')
 print(f'Координаты: {format_sphere_coords(*start_point)}')
 
-theta, phi = vector_point_to_bloch_angles(end_vector_point)
-end_point = point_coords_by_angles(theta, phi)
-
 print()
 print('Конец вектора')
-print(f'θ: {format_angle_for_view(theta)}')
-print(f'φ: {format_angle_for_view(phi)}')
+print(f'θ: {format_angle_for_view(end_theta)}')
+print(f'φ: {format_angle_for_view(end_phi)}')
 print(f'Точка: {format_vector_point(end_vector_point)}')
 print(f'Координаты: {format_sphere_coords(*end_point)}')
 

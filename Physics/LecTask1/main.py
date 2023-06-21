@@ -1,41 +1,54 @@
 import matplotlib.pyplot as plt
 
 
-def to_binary_digits(s):
-    """
-    Переводит строку в двоичный код (список нулей и единиц)
-
-    :param s:
-    :return:
-    """
-    return [int(digit) for i in s for digit in f"{ord(i):b}"]
+def to_binary_str(s):
+    return " ".join(f"{ord(i):08b}" for i in s)
 
 
-def meander(binary_digits, frequency):
-    """
-    Функция преобразует двоичный код в список значений функции меандра.
-
-    :param binary_digits: двоичный код
-    :param frequency: количество точек на графике для каждого бита кода (начало и конец)
-    :return: список значений функции меандра
-    """
-    return [int(digit) for digit in binary_digits for _ in range(frequency)]
+def calculate_delta_t_dispersion(c, b, lambda_0, L, delta_lambda):
+    D = b ** 2 * lambda_0 / (c ** 2 + b ** 2 * lambda_0 ** 2) * 0.5
+    delta_t_dispersion = (D * L * delta_lambda) / lambda_0 ** 2
+    return delta_t_dispersion
 
 
-word = "physics"
-word_binary_digits = to_binary_digits(word)
+c = 3e8
+L = 1  # предполагаемая длина среды в метрах
+lambda_0 = 1.5e-6
+delta_t = 1e-5
+delta_lambda = 1 / delta_t
+for b in [1, 10, 100]:
+    delta_t_dispersion = calculate_delta_t_dispersion(c, b, lambda_0, L, delta_lambda)
+    print(f"Характерное время расплывания пакета для b = {b}: {delta_t_dispersion} с")
 
-print(f"Word: {word}")
-print(f"Binary: {word_binary_digits}")
+word = "qubit"
+binary_code_str = to_binary_str(word)
+print(f"Слово: {word}")
+print(f"Двоичный код: {binary_code_str}")
 
-meander_values = meander(
-    binary_digits=word_binary_digits,
-    frequency=2
-)
+binary_code = binary_code_str.replace(" ", "")
 
-x_labels = list(range(len(meander_values)))
-plt.plot(x_labels, meander_values, color='green')
-plt.ylabel("Значение")
+time_points = []
+current_time = 0
+
+L = 1
+b = 1000
+delta_t_dispersion = calculate_delta_t_dispersion(c, b, lambda_0, L, delta_lambda)
+bit_time = delta_t_dispersion / len(binary_code)  # время для прохождения одного бита
+for bit in binary_code:
+    time_points.append(current_time)
+    time_points.append(current_time + bit_time)
+    current_time += bit_time
+
+values = []
+for bit in binary_code:
+    if bit == "0":
+        values.extend([0, 0])
+    elif bit == "1":
+        values.extend([1, 1])
+
+plt.plot(time_points, values)
+plt.title(f"Слово: {word}\nКод: {binary_code}")
 plt.xlabel("Время")
-plt.title(f"Слово: {word}")
+plt.ylabel("Амплитуда")
+plt.ylim(-0.5, 1.5)
 plt.show()

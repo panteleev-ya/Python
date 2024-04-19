@@ -63,7 +63,7 @@ async def start(message: types.Message):
 @dp.message_handler(commands=['purchase'], state="*")
 async def register_purchase(message: types.Message):
     await RegisterPurchaseFSM.input_cost.set()
-    await message.reply("Давайте зарегистрируем покупку. Введите стоимость в $:")
+    await message.reply("Давайте зарегистрируем покупку. Введите стоимость в $")
 
 
 # Обработчик ввода стоимости покупки
@@ -76,7 +76,7 @@ async def input_cost(message: types.Message, state: FSMContext):
         keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
         for category in categories:
             keyboard.add(category)
-        await message.reply("Выберите категорию:", reply_markup=keyboard)
+        await message.reply("Выберите категорию", reply_markup=keyboard)
     except ValueError:
         await message.reply("Некорректная стоимость. Пожалуйста, отправьте число.",
                             reply_markup=types.ReplyKeyboardRemove())
@@ -88,7 +88,7 @@ async def select_category(message: types.Message, state: FSMContext):
     category = message.text
     await state.update_data(category=category)
     await RegisterPurchaseFSM.next()
-    await message.reply("Введите номер карты:", reply_markup=types.ReplyKeyboardRemove())
+    await message.reply("Введите номер карты", reply_markup=types.ReplyKeyboardRemove())
 
 
 # Обработчик ввода номера карты
@@ -100,7 +100,7 @@ async def input_card_number(message: types.Message, state: FSMContext):
     keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
     for bank in banks:
         keyboard.add(bank)
-    await message.reply("Выберите банк:", reply_markup=keyboard)
+    await message.reply("Выберите банк", reply_markup=keyboard)
 
 
 # Обработчик выбора банка
@@ -109,7 +109,7 @@ async def select_bank(message: types.Message, state: FSMContext):
     bank = message.text
     await state.update_data(bank=bank)
     await RegisterPurchaseFSM.next()
-    await message.reply("Введите цель покупки:", reply_markup=types.ReplyKeyboardRemove())
+    await message.reply("Введите цель покупки", reply_markup=types.ReplyKeyboardRemove())
 
 
 # Обработчик ввода цели покупки

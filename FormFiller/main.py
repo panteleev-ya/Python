@@ -173,6 +173,8 @@ async def input_purpose(message: types.Message, state: FSMContext):
 
     response = requests.post(form_response_url, data=form_data, headers=user_agent)
     print(str(response.status_code), str(form_data))
+    if response.status_code != 200:
+        print(str(response.text))
     await message.reply(f"Покупка зарегистрирована\n{datetime.now()}\n\n{purchase}")
     await delete_previous_user_messages(message.chat.id)
     await state.finish()

@@ -172,7 +172,7 @@ async def input_purpose(message: types.Message, state: FSMContext):
     }
 
     response = requests.post(form_response_url, data=form_data, headers=user_agent)
-    print(str(response.status_code), str(response.text))
+    print(str(response.status_code), str(form_data))
     await message.reply(f"Покупка зарегистрирована\n{datetime.now()}\n\n{purchase}")
     await delete_previous_user_messages(message.chat.id)
     await state.finish()
@@ -182,16 +182,8 @@ async def error_handler(_, exception):
     print(f"Exception while handling an update: {exception}")
 
 
-async def on_startup(_dp):
-    pass
-
-
-async def on_shutdown(_dp):
-    await conn.close()
-
-
 def main():
-    executor.start_polling(dp, skip_updates=True, on_startup=on_startup, on_shutdown=on_shutdown)
+    executor.start_polling(dp, skip_updates=True)
 
 
 if __name__ == '__main__':

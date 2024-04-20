@@ -182,12 +182,10 @@ async def error_handler(_, exception):
 
 
 async def on_startup(_dp):
-    await create_tables_if_not_exists()
+    pass
 
 
 async def on_shutdown(_dp):
-    await bot.session.close()
-    await _dp.storage.close()
     await conn.close()
 
 

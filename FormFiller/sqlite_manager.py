@@ -88,3 +88,13 @@ async def delete_all_user_message_ids(chat_id: int):
 categories = load_categories()
 banks = load_banks()
 known_users = load_users()
+
+
+async def create_tables_if_not_exists():
+    cursor.execute("""create table if not exists banks(id INTEGER primary key, bank_name TEXT)""")
+    cursor.execute("""create table if not exists bot_messages(id INTEGER primary key, message_id INTEGER, chat_id INTEGER)""")
+    cursor.execute("""create table if not exists card_bank_mapping(id INTEGER primary key, card_number TEXT unique, bank_name TEXT)""")
+    cursor.execute("""create table if not exists categories(id INTEGER primary key, category_name TEXT)""")
+    cursor.execute("""create table if not exists user_messages(id INTEGER primary key, message_id INTEGER, chat_id INTEGER)""")
+    cursor.execute("""create table if not exists users(id INTEGER primary key, user_id TEXT, username TEXT)""")
+    conn.commit()

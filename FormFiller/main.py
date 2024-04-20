@@ -8,6 +8,7 @@ from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.utils import executor
 from sqlite_manager import *
+from datetime import datetime
 
 BOT_TOKEN = open("token.txt", "r").read().strip()
 
@@ -28,15 +29,23 @@ class RegisterPurchaseFSM(StatesGroup):
     input_purpose = State()
 
 
-async def delete_previous_messages(chat_id: int):
+async def delete_previous_bot_messages(chat_id: int):
     message_ids = await get_all_bot_message_ids(chat_id)
     for message_id in message_ids:
         await bot.delete_message(chat_id=chat_id, message_id=message_id)
     await delete_all_bot_message_ids(chat_id)
 
 
+async def delete_previous_user_messages(chat_id: int):
+    message_ids = await get_all_user_message_ids(chat_id)
+    for message_id in message_ids:
+        await bot.delete_message(chat_id=chat_id, message_id=message_id)
+    await delete_all_user_message_ids(chat_id)
+
+
 async def before_reply(message: types.Message):
-    await before_reply(message)
+    await add_user_message_id(message)
+    await delete_previous_bot_messages(message.chat.id)
 
 
 # Обработчик команды /start
@@ -136,23 +145,26 @@ async def select_bank(message: types.Message, state: FSMContext):
 @dp.message_handler(state=RegisterPurchaseFSM.input_purpose)
 async def input_purpose(message: types.Message, state: FSMContext):
     await before_reply(message)
-    purpose = message.text
+    purpose = str(message.text)
     user_id = str(message.from_user.id)
-    user = known_users[user_id] if user_id in known_users else user_id
+    user = str(known_users[user_id] if user_id in known_users else user_id)
     data = await state.get_data()
-    cost = data.get('cost')
-    category = data.get('category')
-    card_number = data.get('card_number')
-    bank = data.get('bank')
+    cost = str(data.get('cost'))
+    category = str(data.get('category'))
+    card_number = str(data.get('card_number'))
+    bank = str(data.get('bank'))
 
     form_data = {
-        "entry.1441644747": str(cost),
-        "entry.767764842": str(category),
-        "entry.1727782915": str(card_number),
-        "entry.412290270": str(bank),
-        "entry.873461443": str(user),
-        "entry.1063838522": str(purpose),
+        "entry.1441644747": cost,
+        "entry.767764842": category,
+        "entry.1727782915": card_number,
+        "entry.412290270": bank,
+        "entry.873461443": user,
+        "entry.1063838522": purpose,
     }
+
+    purchase = (f"Cost: ${cost}\nCategory: {category}\nCard: ••{card_number}\n"
+                f"Bank: {bank}\nUser: {user}\nPurpose: {purpose}")
 
     user_agent = {
         "Referer": form_view_url,
@@ -160,13 +172,17 @@ async def input_purpose(message: types.Message, state: FSMContext):
     }
 
     _ = requests.post(form_response_url, data=form_data, headers=user_agent)
-    sent_message = await message.reply("Покупка зарегистрирована!")
-    await add_bot_message(sent_message)
+    await message.reply(f"Покупка зарегистрирована\n{datetime.now()}\n\n{purchase}")
+    await delete_previous_user_messages(message.chat.id)
     await state.finish()
 
 
 async def error_handler(_, exception):
     print(f"Exception while handling an update: {exception}")
+
+
+async def on_startup(_dp):
+    await create_tables_if_not_exists()
 
 
 async def on_shutdown(_dp):
@@ -176,7 +192,7 @@ async def on_shutdown(_dp):
 
 
 def main():
-    executor.start_polling(dp, skip_updates=True, on_shutdown=on_shutdown)
+    executor.start_polling(dp, skip_updates=True, on_startup=on_startup, on_shutdown=on_shutdown)
 
 
 if __name__ == '__main__':

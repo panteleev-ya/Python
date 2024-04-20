@@ -151,7 +151,7 @@ async def input_purpose(message: types.Message, state: FSMContext):
     data = await state.get_data()
     cost = str(data.get('cost'))
     category = str(data.get('category'))
-    card_number = str(data.get('card_number'))
+    card_number = int(data.get('card_number'))
     bank = str(data.get('bank'))
 
     form_data = {
